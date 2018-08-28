@@ -85,13 +85,11 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
         return None;
     }
 
-    let normal_weight = MAX_U64 - 1;
-
     let index_scale = (high as f64) / (weights_len as f64);
 
-    let weights_scale = (normal_weight as f64) / weights_sum;
+    let weights_scale = (MAX_U64 as f64) / weights_sum;
 
-    let rnd = random_u64(0, normal_weight) as f64;
+    let rnd = random_u64(0, MAX_U64) as f64;
 
     let mut temp = 0f64;
 
@@ -110,11 +108,15 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
 fn random_u64(a: u64, b: u64) -> u64 {
     let rnd: u64 = rand::thread_rng().gen();
 
-    if b >= a {
+    let rnd = rnd as u128;
+    let a = a as u128;
+    let b = b as u128;
+
+    (if b >= a {
         (rnd % (b - a + 1)) + a
     } else {
         (rnd % (a - b + 1)) + b
-    }
+    }) as u64
 }
 
 #[cfg(test)]
@@ -303,16 +305,16 @@ mod tests {
 
         for ref picked_item in result {
             match picked_item {
-                Prize::Legendary=>{
+                Prize::Legendary => {
                     counter[0] += 1;
                 }
-                Prize::Rare=>{
+                Prize::Rare => {
                     counter[1] += 1;
                 }
-                Prize::Enchanted=>{
+                Prize::Enchanted => {
                     counter[2] += 1;
                 }
-                Prize::Common=>{
+                Prize::Common => {
                     counter[3] += 1;
                 }
             }

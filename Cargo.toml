@@ -1,6 +1,6 @@
 [package]
 name = "random-pick"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Magic Len <len@magiclen.org>"]
 repository = "https://github.com/magiclen/random-pick"
 homepage = "https://magiclen.org/random-pick"
