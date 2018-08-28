@@ -52,7 +52,7 @@ extern crate rand;
 
 use rand::Rng;
 
-const MAX_U64: u64 = u64::max_value();
+const MAX_NUMBER: usize = usize::max_value();
 
 /// Pick an element from a slice randomly by given weights.
 pub fn pick_from_slice<'a, T>(slice: &'a [T], weights: &'a [usize]) -> Option<&'a T> {
@@ -87,25 +87,26 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
 
     let index_scale = (high as f64) / (weights_len as f64);
 
-    let weights_scale = (MAX_U64 as f64) / weights_sum;
+    let weights_scale = (MAX_NUMBER as f64) / weights_sum;
 
-    let rnd = random_u64(0, MAX_U64) as f64;
+    let rnd = random_integer(0, MAX_NUMBER) as f64;
 
     let mut temp = 0f64;
 
     for (i, &w) in weights.iter().enumerate() {
         temp += (w as f64) * weights_scale;
         if temp > rnd {
-            let index = ((i as f64) * index_scale) as u64;
+            let index = ((i as f64) * index_scale) as usize;
 
-            return Some(random_u64(index, ((((i + 1) as f64) * index_scale) - 1f64) as u64) as usize);
+            return Some(random_integer(index, ((((i + 1) as f64) * index_scale) - 1f64) as usize));
         }
     }
 
     None
 }
 
-fn random_u64(a: u64, b: u64) -> u64 {
+#[cfg(target_pointer_width = "64")]
+fn random_integer(a: usize, b: usize) -> usize {
     let rnd: u64 = rand::thread_rng().gen();
 
     let rnd = rnd as u128;
@@ -116,7 +117,58 @@ fn random_u64(a: u64, b: u64) -> u64 {
         (rnd % (b - a + 1)) + a
     } else {
         (rnd % (a - b + 1)) + b
-    }) as u64
+    }) as usize
+}
+
+#[cfg(target_pointer_width = "32")]
+fn random_integer(a: usize, b: usize) -> usize {
+    if a > b {
+        let a = a as u64;
+        let b = b as u64;
+
+        rand::thread_rng().gen_range(b, a + 1) as usize
+    } else if a == b {
+        a
+    } else {
+        let a = a as u64;
+        let b = b as u64;
+
+        rand::thread_rng().gen_range(a, b + 1) as usize
+    }
+}
+
+#[cfg(target_pointer_width = "16")]
+fn random_integer(a: usize, b: usize) -> usize {
+    if a > b {
+        let a = a as u32;
+        let b = b as u32;
+
+        rand::thread_rng().gen_range(b, a + 1) as usize
+    } else if a == b {
+        a
+    } else {
+        let a = a as u32;
+        let b = b as u32;
+
+        rand::thread_rng().gen_range(a, b + 1) as usize
+    }
+}
+
+#[cfg(target_pointer_width = "8")]
+fn random_integer(a: usize, b: usize) -> usize {
+    if a > b {
+        let a = a as u16;
+        let b = b as u16;
+
+        rand::thread_rng().gen_range(b, a + 1) as usize
+    } else if a == b {
+        a
+    } else {
+        let a = a as u16;
+        let b = b as u16;
+
+        rand::thread_rng().gen_range(a, b + 1) as usize
+    }
 }
 
 #[cfg(test)]
@@ -124,7 +176,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_random_u64() {
+    fn test_random_integer() {
         let mut result = Vec::new();
 
         let n = 1000000;
@@ -132,7 +184,7 @@ mod tests {
         let nn = n / 10;
 
         for _ in 0..n {
-            result.push(random_u64(0, 9));
+            result.push(random_integer(0, 9));
         }
 
         let mut counter = [0usize; 10];
