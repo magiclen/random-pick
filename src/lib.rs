@@ -48,9 +48,9 @@
 //!
 //! The length of the slice is usually an integral multiple (larger than zero) of that of weights.
 
-extern crate rand;
+extern crate random_integer;
 
-use rand::Rng;
+use random_integer::random_usize;
 
 const MAX_NUMBER: usize = usize::max_value();
 
@@ -89,7 +89,7 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
 
     let weights_scale = (MAX_NUMBER as f64) / weights_sum;
 
-    let rnd = random_integer(0, MAX_NUMBER) as f64;
+    let rnd = random_usize(0, MAX_NUMBER) as f64;
 
     let mut temp = 0f64;
 
@@ -98,111 +98,16 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
         if temp > rnd {
             let index = ((i as f64) * index_scale) as usize;
 
-            return Some(random_integer(index, ((((i + 1) as f64) * index_scale) - 1f64) as usize));
+            return Some(random_usize(index, ((((i + 1) as f64) * index_scale) - 1f64) as usize));
         }
     }
 
     None
 }
 
-#[cfg(target_pointer_width = "64")]
-fn random_integer(a: usize, b: usize) -> usize {
-    let rnd: u64 = rand::thread_rng().gen();
-
-    let rnd = rnd as u128;
-    let a = a as u128;
-    let b = b as u128;
-
-    (if b >= a {
-        (rnd % (b - a + 1)) + a
-    } else {
-        (rnd % (a - b + 1)) + b
-    }) as usize
-}
-
-#[cfg(target_pointer_width = "32")]
-fn random_integer(a: usize, b: usize) -> usize {
-    if a > b {
-        let a = a as u64;
-        let b = b as u64;
-
-        rand::thread_rng().gen_range(b, a + 1) as usize
-    } else if a == b {
-        a
-    } else {
-        let a = a as u64;
-        let b = b as u64;
-
-        rand::thread_rng().gen_range(a, b + 1) as usize
-    }
-}
-
-#[cfg(target_pointer_width = "16")]
-fn random_integer(a: usize, b: usize) -> usize {
-    if a > b {
-        let a = a as u32;
-        let b = b as u32;
-
-        rand::thread_rng().gen_range(b, a + 1) as usize
-    } else if a == b {
-        a
-    } else {
-        let a = a as u32;
-        let b = b as u32;
-
-        rand::thread_rng().gen_range(a, b + 1) as usize
-    }
-}
-
-#[cfg(target_pointer_width = "8")]
-fn random_integer(a: usize, b: usize) -> usize {
-    if a > b {
-        let a = a as u16;
-        let b = b as u16;
-
-        rand::thread_rng().gen_range(b, a + 1) as usize
-    } else if a == b {
-        a
-    } else {
-        let a = a as u16;
-        let b = b as u16;
-
-        rand::thread_rng().gen_range(a, b + 1) as usize
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_random_integer() {
-        let mut result = Vec::new();
-
-        let n = 1000000;
-
-        let nn = n / 10;
-
-        for _ in 0..n {
-            result.push(random_integer(0, 9));
-        }
-
-        let mut counter = [0usize; 10];
-
-        for i in result {
-            counter[i as usize] += 1;
-        }
-
-        let mut errs = [0f64; 10];
-
-        for (i, &c) in counter.iter().enumerate() {
-            errs[i] = (((nn as isize) - (c as isize)) as f64).abs() / (nn as f64);
-        }
-
-        for &err in errs.iter() {
-            assert!(err < 0.02);
-        }
-    }
 
     #[test]
     fn test_gen_index_with_weights_1() {
@@ -227,7 +132,7 @@ mod tests {
 
         let err = (b - a).abs() / b;
 
-        assert!(err < 0.02);
+        assert!(err < 0.025);
     }
 
     #[test]
@@ -255,7 +160,7 @@ mod tests {
 
                 let err = (b - a).abs() / b;
 
-                assert!(err < 0.02);
+                assert!(err < 0.025);
             }
         }
     }
@@ -287,7 +192,7 @@ mod tests {
 
         let err = (b - a).abs() / b;
 
-        assert!(err < 0.02);
+        assert!(err < 0.025);
     }
 
     #[test]
@@ -325,7 +230,7 @@ mod tests {
 
                 let err = (b - a).abs() / b;
 
-                assert!(err < 0.02);
+                assert!(err < 0.025);
             }
         }
     }
@@ -380,7 +285,7 @@ mod tests {
 
                 let err = (b - a).abs() / b;
 
-                assert!(err < 0.02);
+                assert!(err < 0.025);
             }
         }
     }
