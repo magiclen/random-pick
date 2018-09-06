@@ -1,7 +1,7 @@
 //! # Random Pick
 //! Pick an element from a slice randomly by given weights.
 //!
-//! ## Example
+//! ## Examples
 //!
 //! ```
 //! extern crate random_pick;
@@ -47,6 +47,8 @@
 //! ```
 //!
 //! The length of the slice is usually an integral multiple (larger than zero) of that of weights.
+//!
+//! If you have multiple slices, you don't need to use extra space to concat them, just use the `pick_from_multiple_slices` function, instead of `pick_from_slice`.
 
 extern crate random_integer;
 
@@ -56,11 +58,30 @@ const MAX_NUMBER: usize = usize::max_value();
 
 /// Pick an element from a slice randomly by given weights.
 pub fn pick_from_slice<'a, T>(slice: &'a [T], weights: &'a [usize]) -> Option<&'a T> {
-    let weights_len = weights.len();
+    let slice_len = slice.len();
 
-    let index = gen_usize_with_weights(weights_len, weights)?;
+    let index = gen_usize_with_weights(slice_len, weights)?;
 
     Some(&slice[index])
+}
+
+/// Pick an element from multiple slices randomly by given weights.
+pub fn pick_from_multiple_slices<'a, T>(slices: &[&'a [T]], weights: &'a [usize]) -> Option<&'a T> {
+    let len: usize = slices.iter().map(|slice| slice.len()).sum();
+
+    let mut index = gen_usize_with_weights(len, weights)?;
+
+    for slice in slices {
+        let len = slice.len();
+
+        if index < len {
+            return Some(&slice[index]);
+        } else {
+            index -= len;
+        }
+    }
+
+    None
 }
 
 /// Get a usize value by given weights.
@@ -69,36 +90,38 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
 
     if weights_len == 0 {
         return None;
-    }
+    } else if weights_len == 1 {
+        return Some(random_usize(0, high));
+    } else {
+        let mut weights_sum = 0f64;
+        let mut max_weight = 0;
 
-    let mut weights_sum = 0f64;
-    let mut max_weight = 0;
-
-    for &w in weights {
-        weights_sum += w as f64;
-        if w > max_weight {
-            max_weight = w;
+        for &w in weights {
+            weights_sum += w as f64;
+            if w > max_weight {
+                max_weight = w;
+            }
         }
-    }
 
-    if max_weight == 0 {
-        return None;
-    }
+        if max_weight == 0 {
+            return None;
+        }
 
-    let index_scale = (high as f64) / (weights_len as f64);
+        let index_scale = (high as f64) / (weights_len as f64);
 
-    let weights_scale = (MAX_NUMBER as f64) / weights_sum;
+        let weights_scale = (MAX_NUMBER as f64) / weights_sum;
 
-    let rnd = random_usize(0, MAX_NUMBER) as f64;
+        let rnd = random_usize(0, MAX_NUMBER) as f64;
 
-    let mut temp = 0f64;
+        let mut temp = 0f64;
 
-    for (i, &w) in weights.iter().enumerate() {
-        temp += (w as f64) * weights_scale;
-        if temp > rnd {
-            let index = ((i as f64) * index_scale) as usize;
+        for (i, &w) in weights.iter().enumerate() {
+            temp += (w as f64) * weights_scale;
+            if temp > rnd {
+                let index = ((i as f64) * index_scale) as usize;
 
-            return Some(random_usize(index, ((((i + 1) as f64) * index_scale) - 1f64) as usize));
+                return Some(random_usize(index, ((((i + 1) as f64) * index_scale) - 1f64) as usize));
+            }
         }
     }
 
@@ -254,6 +277,62 @@ mod tests {
 
         for _ in 0..n {
             let picked_item = pick_from_slice(&prize_list, &weights).unwrap();
+
+            result.push(picked_item);
+        }
+
+        let mut counter = [0usize; 4];
+
+        for ref picked_item in result {
+            match picked_item {
+                Prize::Legendary => {
+                    counter[0] += 1;
+                }
+                Prize::Rare => {
+                    counter[1] += 1;
+                }
+                Prize::Enchanted => {
+                    counter[2] += 1;
+                }
+                Prize::Common => {
+                    counter[3] += 1;
+                }
+            }
+        }
+
+        for i in 0..4 {
+            for j in i..4 {
+                let a = (counter[i] as f64) * (weights[j] as f64) / (weights[i] as f64);
+
+                let b = counter[j] as f64;
+
+                let err = (b - a).abs() / b;
+
+                assert!(err < 0.025);
+            }
+        }
+    }
+
+    #[test]
+    fn test_pick_from_mutiple_slices() {
+        enum Prize {
+            Legendary,
+            Rare,
+            Enchanted,
+            Common,
+        }
+
+        let prize_list_1 = [Prize::Legendary, Prize::Rare];
+        let prize_list_2 = [Prize::Enchanted, Prize::Common];
+
+        let weights = [1, 5, 15, 30];
+
+
+        let n = 1000000;
+        let mut result = Vec::new();
+
+        for _ in 0..n {
+            let picked_item = pick_from_multiple_slices(&[&prize_list_1, &prize_list_2], &weights).unwrap();
 
             result.push(picked_item);
         }
