@@ -53,6 +53,8 @@ println!("{}", counter[3]); // Should be close to 600000
 
 The length of the slice is usually an integral multiple (larger than zero) of that of weights.
 
+If you have multiple slices, you don't need to use extra space to concat them, just use the `pick_from_multiple_slices` function, instead of `pick_from_slice`.
+
 
 ## Crates.io
 
