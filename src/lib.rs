@@ -128,7 +128,7 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
             return None;
         }
 
-        return Some(random_usize(0, high));
+        return Some(random_usize(0, high - 1));
     } else {
         let mut weights_sum = 0f64;
         let mut max_weight = 0;
@@ -174,7 +174,9 @@ pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: us
     if weights_len > 0 && high > 0 {
         if weights_len == 1 {
             if weights[0] != 0 {
-                result.push(random_usize(0, high));
+                for _ in 0..count {
+                    result.push(random_usize(0, high - 1));
+                }
             }
         } else {
             let mut weights_sum = 0f64;
@@ -345,6 +347,46 @@ mod tests {
     }
 
     #[test]
+    fn test_gen_index_with_weights_5() {
+        let mut result = Vec::new();
+
+        let n = 1000000;
+        let weights = [5];
+
+        for _ in 0..n {
+            result.push(gen_usize_with_weights(10, &weights).unwrap());
+        }
+
+        let mut counter = [0usize; 5];
+
+        for i in result {
+            if i < 2 {
+                counter[0] += 1;
+            } else if i < 4 {
+                counter[1] += 1;
+            } else if i < 6 {
+                counter[2] += 1;
+            } else if i < 8 {
+                counter[3] += 1;
+            } else {
+                counter[4] += 1;
+            }
+        }
+
+        for i in 0..5 {
+            for j in i..5 {
+                let a = counter[i] as f64;
+
+                let b = counter[j] as f64;
+
+                let err = (b - a).abs() / b;
+
+                assert!(err < 0.025);
+            }
+        }
+    }
+
+    #[test]
     fn test_gen_multiple_index_with_weights_1() {
         let n = 1000000;
         let weights = [5, 10];
@@ -444,6 +486,42 @@ mod tests {
         for i in 0..5 {
             for j in i..5 {
                 let a = (counter[i] as f64) * (weights[j] as f64) / (weights[i] as f64);
+
+                let b = counter[j] as f64;
+
+                let err = (b - a).abs() / b;
+
+                assert!(err < 0.025);
+            }
+        }
+    }
+
+    #[test]
+    fn test_gen_multiple_index_with_weights_5() {
+        let n = 1000000;
+        let weights = [5];
+
+        let result = gen_multiple_usize_with_weights(10, &weights, n);
+
+        let mut counter = [0usize; 5];
+
+        for i in result {
+            if i < 2 {
+                counter[0] += 1;
+            } else if i < 4 {
+                counter[1] += 1;
+            } else if i < 6 {
+                counter[2] += 1;
+            } else if i < 8 {
+                counter[3] += 1;
+            } else {
+                counter[4] += 1;
+            }
+        }
+
+        for i in 0..5 {
+            for j in i..5 {
+                let a = counter[i] as f64;
 
                 let b = counter[j] as f64;
 
