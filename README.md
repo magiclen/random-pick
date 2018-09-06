@@ -55,6 +55,7 @@ The length of the slice is usually an integral multiple (larger than zero) of th
 
 If you have multiple slices, you don't need to use extra space to concat them, just use the `pick_from_multiple_slices` function, instead of `pick_from_slice`.
 
+Besides picking a single element from a slice or slices, you can also use `pick_multiple_from_slice` and `pick_multiple_from_multiple_slices` functions. Their overhead is lower than that of non-multiple-pick functions with extra loops.
 
 ## Crates.io
 

@@ -49,6 +49,8 @@
 //! The length of the slice is usually an integral multiple (larger than zero) of that of weights.
 //!
 //! If you have multiple slices, you don't need to use extra space to concat them, just use the `pick_from_multiple_slices` function, instead of `pick_from_slice`.
+//!
+//! Besides picking a single element from a slice or slices, you can also use `pick_multiple_from_slice` and `pick_multiple_from_multiple_slices` functions. Their overhead is lower than that of non-multiple-pick functions with extra loops.
 
 extern crate random_integer;
 
@@ -84,13 +86,48 @@ pub fn pick_from_multiple_slices<'a, T>(slices: &[&'a [T]], weights: &'a [usize]
     None
 }
 
+/// Pick multiple elements from a slice randomly by given weights.
+pub fn pick_multiple_from_slice<'a, T>(slice: &'a [T], weights: &'a [usize], count: usize) -> Vec<&'a T> {
+    let slice_len = slice.len();
+
+    gen_multiple_usize_with_weights(slice_len, weights, count).iter().map(|&index| &slice[index]).collect()
+}
+
+/// Pick multiple elements from multiple slices randomly by given weights.
+pub fn pick_multiple_from_multiple_slices<'a, T>(slices: &[&'a [T]], weights: &'a [usize], count: usize) -> Vec<&'a T> {
+    let len: usize = slices.iter().map(|slice| slice.len()).sum();
+
+    gen_multiple_usize_with_weights(len, weights, count).iter().map(|index| {
+        let mut index = *index;
+
+        let mut s = slices[0];
+
+        for slice in slices {
+            let len = slice.len();
+
+            if index < len {
+                s = slice;
+                break;
+            } else {
+                index -= len;
+            }
+        }
+
+        &s[index]
+    }).collect()
+}
+
 /// Get a usize value by given weights.
 pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
     let weights_len = weights.len();
 
-    if weights_len == 0 {
+    if weights_len == 0 || high == 0 {
         return None;
     } else if weights_len == 1 {
+        if weights[0] == 0 {
+            return None;
+        }
+
         return Some(random_usize(0, high));
     } else {
         let mut weights_sum = 0f64;
@@ -126,6 +163,55 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
     }
 
     None
+}
+
+/// Get multiple usize values by given weights.
+pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: usize) -> Vec<usize> {
+    let mut result: Vec<usize> = Vec::new();
+
+    let weights_len = weights.len();
+
+    if weights_len > 0 && high > 0 {
+        if weights_len == 1 {
+            if weights[0] != 0 {
+                result.push(random_usize(0, high));
+            }
+        } else {
+            let mut weights_sum = 0f64;
+            let mut max_weight = 0;
+
+            for &w in weights {
+                weights_sum += w as f64;
+                if w > max_weight {
+                    max_weight = w;
+                }
+            }
+
+            if max_weight > 0 {
+                let index_scale = (high as f64) / (weights_len as f64);
+
+                let weights_scale = (MAX_NUMBER as f64) / weights_sum;
+
+                for _ in 0..count {
+                    let rnd = random_usize(0, MAX_NUMBER) as f64;
+
+                    let mut temp = 0f64;
+
+                    for (i, &w) in weights.iter().enumerate() {
+                        temp += (w as f64) * weights_scale;
+                        if temp > rnd {
+                            let index = ((i as f64) * index_scale) as usize;
+
+                            result.push(random_usize(index, ((((i + 1) as f64) * index_scale) - 1f64) as usize));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    result
 }
 
 #[cfg(test)]
@@ -259,6 +345,116 @@ mod tests {
     }
 
     #[test]
+    fn test_gen_multiple_index_with_weights_1() {
+        let n = 1000000;
+        let weights = [5, 10];
+
+        let result = gen_multiple_usize_with_weights(2, &weights, n);
+
+        let mut counter = [0usize; 2];
+
+        for i in result {
+            counter[i] += 1;
+        }
+
+        let a = (counter[0] as f64) * (weights[1] as f64) / (weights[0] as f64);
+
+        let b = counter[1] as f64;
+
+        let err = (b - a).abs() / b;
+
+        assert!(err < 0.025);
+    }
+
+    #[test]
+    fn test_gen_multiple_index_with_weights_2() {
+        let n = 1000000;
+        let weights = [5, 10, 15, 20, 25];
+
+        let result = gen_multiple_usize_with_weights(5, &weights, n);
+
+        let mut counter = [0usize; 5];
+
+        for i in result {
+            counter[i] += 1;
+        }
+
+        for i in 0..5 {
+            for j in i..5 {
+                let a = (counter[i] as f64) * (weights[j] as f64) / (weights[i] as f64);
+
+                let b = counter[j] as f64;
+
+                let err = (b - a).abs() / b;
+
+                assert!(err < 0.025);
+            }
+        }
+    }
+
+    #[test]
+    fn test_gen_multiple_index_with_weights_3() {
+        let n = 1000000;
+        let weights = [5, 10];
+
+        let result = gen_multiple_usize_with_weights(10, &weights, n);
+
+        let mut counter = [0usize; 2];
+
+        for i in result {
+            if i < 5 {
+                counter[0] += 1;
+            } else {
+                counter[1] += 1;
+            }
+        }
+
+        let a = (counter[0] as f64) * (weights[1] as f64) / (weights[0] as f64);
+
+        let b = counter[1] as f64;
+
+        let err = (b - a).abs() / b;
+
+        assert!(err < 0.025);
+    }
+
+    #[test]
+    fn test_gen_multiple_index_with_weights_4() {
+        let n = 1000000;
+        let weights = [5, 10, 15, 20, 25];
+
+        let result = gen_multiple_usize_with_weights(10, &weights, n);
+
+        let mut counter = [0usize; 5];
+
+        for i in result {
+            if i < 2 {
+                counter[0] += 1;
+            } else if i < 4 {
+                counter[1] += 1;
+            } else if i < 6 {
+                counter[2] += 1;
+            } else if i < 8 {
+                counter[3] += 1;
+            } else {
+                counter[4] += 1;
+            }
+        }
+
+        for i in 0..5 {
+            for j in i..5 {
+                let a = (counter[i] as f64) * (weights[j] as f64) / (weights[i] as f64);
+
+                let b = counter[j] as f64;
+
+                let err = (b - a).abs() / b;
+
+                assert!(err < 0.025);
+            }
+        }
+    }
+
+    #[test]
     fn test_pick_from_slice() {
         enum Prize {
             Legendary,
@@ -314,7 +510,106 @@ mod tests {
     }
 
     #[test]
-    fn test_pick_from_mutiple_slices() {
+    fn test_pick_multiple_from_slice() {
+        enum Prize {
+            Legendary,
+            Rare,
+            Enchanted,
+            Common,
+        }
+
+        let prize_list = [Prize::Legendary, Prize::Rare, Prize::Enchanted, Prize::Common];
+
+        let weights = [1, 5, 15, 30];
+
+
+        let n = 1000000;
+        let result = pick_multiple_from_slice(&prize_list, &weights, n);
+
+        let mut counter = [0usize; 4];
+
+        for ref picked_item in result {
+            match picked_item {
+                Prize::Legendary => {
+                    counter[0] += 1;
+                }
+                Prize::Rare => {
+                    counter[1] += 1;
+                }
+                Prize::Enchanted => {
+                    counter[2] += 1;
+                }
+                Prize::Common => {
+                    counter[3] += 1;
+                }
+            }
+        }
+
+        for i in 0..4 {
+            for j in i..4 {
+                let a = (counter[i] as f64) * (weights[j] as f64) / (weights[i] as f64);
+
+                let b = counter[j] as f64;
+
+                let err = (b - a).abs() / b;
+
+                assert!(err < 0.025);
+            }
+        }
+    }
+
+    #[test]
+    fn test_pick_from_mutliple_slices() {
+        enum Prize {
+            Legendary,
+            Rare,
+            Enchanted,
+            Common,
+        }
+
+        let prize_list_1 = [Prize::Legendary, Prize::Rare];
+        let prize_list_2 = [Prize::Enchanted, Prize::Common];
+
+        let weights = [1, 5, 15, 30];
+
+
+        let n = 1000000;
+        let result = pick_multiple_from_multiple_slices(&[&prize_list_1, &prize_list_2], &weights, n);
+
+        let mut counter = [0usize; 4];
+
+        for ref picked_item in result {
+            match picked_item {
+                Prize::Legendary => {
+                    counter[0] += 1;
+                }
+                Prize::Rare => {
+                    counter[1] += 1;
+                }
+                Prize::Enchanted => {
+                    counter[2] += 1;
+                }
+                Prize::Common => {
+                    counter[3] += 1;
+                }
+            }
+        }
+
+        for i in 0..4 {
+            for j in i..4 {
+                let a = (counter[i] as f64) * (weights[j] as f64) / (weights[i] as f64);
+
+                let b = counter[j] as f64;
+
+                let err = (b - a).abs() / b;
+
+                assert!(err < 0.025);
+            }
+        }
+    }
+
+    #[test]
+    fn test_pick_multiple_from_mutliple_slices() {
         enum Prize {
             Legendary,
             Rare,
