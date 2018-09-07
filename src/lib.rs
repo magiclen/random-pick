@@ -167,7 +167,7 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
 
 /// Get multiple usize values by given weights.
 pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: usize) -> Vec<usize> {
-    let mut result: Vec<usize> = Vec::new();
+    let mut result: Vec<usize> = Vec::with_capacity(count);
 
     let weights_len = weights.len();
 
@@ -222,10 +222,10 @@ mod tests {
 
     #[test]
     fn test_gen_index_with_weights_1() {
-        let mut result = Vec::new();
-
         let n = 1000000;
         let weights = [5, 10];
+
+        let mut result = Vec::with_capacity(n);
 
         for _ in 0..n {
             result.push(gen_usize_with_weights(2, &weights).unwrap());
@@ -248,10 +248,10 @@ mod tests {
 
     #[test]
     fn test_gen_index_with_weights_2() {
-        let mut result = Vec::new();
+        let weights = [5, 10, 15, 20, 25];
 
         let n = 1000000;
-        let weights = [5, 10, 15, 20, 25];
+        let mut result = Vec::with_capacity(n);
 
         for _ in 0..n {
             result.push(gen_usize_with_weights(5, &weights).unwrap());
@@ -278,10 +278,10 @@ mod tests {
 
     #[test]
     fn test_gen_index_with_weights_3() {
-        let mut result = Vec::new();
-
         let n = 1000000;
         let weights = [5, 10];
+
+        let mut result = Vec::with_capacity(n);
 
         for _ in 0..n {
             result.push(gen_usize_with_weights(10, &weights).unwrap());
@@ -308,10 +308,10 @@ mod tests {
 
     #[test]
     fn test_gen_index_with_weights_4() {
-        let mut result = Vec::new();
-
         let n = 1000000;
         let weights = [5, 10, 15, 20, 25];
+
+        let mut result = Vec::with_capacity(n);
 
         for _ in 0..n {
             result.push(gen_usize_with_weights(10, &weights).unwrap());
@@ -348,10 +348,10 @@ mod tests {
 
     #[test]
     fn test_gen_index_with_weights_5() {
-        let mut result = Vec::new();
-
         let n = 1000000;
         let weights = [5];
+
+        let mut result = Vec::with_capacity(n);
 
         for _ in 0..n {
             result.push(gen_usize_with_weights(10, &weights).unwrap());
@@ -547,7 +547,7 @@ mod tests {
 
 
         let n = 1000000;
-        let mut result = Vec::new();
+        let mut result = Vec::with_capacity(n);
 
         for _ in 0..n {
             let picked_item = pick_from_slice(&prize_list, &weights).unwrap();
@@ -702,7 +702,7 @@ mod tests {
 
 
         let n = 1000000;
-        let mut result = Vec::new();
+        let mut result = Vec::with_capacity(n);
 
         for _ in 0..n {
             let picked_item = pick_from_multiple_slices(&[&prize_list_1, &prize_list_2], &weights).unwrap();
