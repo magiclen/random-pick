@@ -1,11 +1,11 @@
 [package]
 name = "random-pick"
-version = "1.2.3"
+version = "1.2.4"
 authors = ["Magic Len <len@magiclen.org>"]
 repository = "https://github.com/magiclen/random-pick"
 homepage = "https://magiclen.org/random-pick"
 keywords = ["random", "pick", "choose", "array", "slice"]
-categories = ["algorithms"]
+categories = ["no-std", "algorithms"]
 description= "Pick an element from a slice randomly by given weights."
 readme = "README.md"
 license = "MIT"

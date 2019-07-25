@@ -54,7 +54,13 @@ If you have multiple slices, you don't need to use extra space to concat them, j
 Besides picking a single element from a slice or slices, you can also use `pick_multiple_from_slice` and `pick_multiple_from_multiple_slices` functions. Their overhead is lower than that of non-multiple-pick functions with extra loops.
 */
 
+#![no_std]
+
+extern crate alloc;
+
 extern crate random_integer;
+
+use alloc::vec::Vec;
 
 use random_integer::random_usize;
 
