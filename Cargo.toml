@@ -1,6 +1,6 @@
 [package]
 name = "random-pick"
-version = "1.2.4"
+version = "1.2.5"
 authors = ["Magic Len <len@magiclen.org>"]
 repository = "https://github.com/magiclen/random-pick"
 homepage = "https://magiclen.org/random-pick"
@@ -10,9 +10,9 @@ description= "Pick an element from a slice randomly by given weights."
 readme = "README.md"
 license = "MIT"
 
-[badges]
-travis-ci = { repository = "magiclen/random-pick", branch = "master" }
-appveyor = { repository = "magiclen/random-pick", branch = "master", service = "github" }
+[badges.travis-ci]
+repository = "magiclen/random-pick"
+branch = "master"
 
 [dependencies]
 random-integer = "1.0.0"

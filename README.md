@@ -2,7 +2,6 @@ Random Pick
 ====================
 
 [![Build Status](https://travis-ci.org/magiclen/random-pick.svg?branch=master)](https://travis-ci.org/magiclen/random-pick)
-[![Build status](https://ci.appveyor.com/api/projects/status/0eh1bp01swr52eef/branch/master?svg=true)](https://ci.appveyor.com/project/magiclen/random-pick/branch/master)
 
 Pick an element from a slice randomly by given weights.
 
