@@ -2,7 +2,7 @@ extern crate random_pick;
 
 #[test]
 fn test_gen_index_with_weights_1() {
-    let n = 1000000;
+    let n = 1_000_000;
     let weights = [5, 10];
 
     let mut result = Vec::with_capacity(n);
@@ -30,7 +30,7 @@ fn test_gen_index_with_weights_1() {
 fn test_gen_index_with_weights_2() {
     let weights = [5, 10, 15, 20, 25];
 
-    let n = 1000000;
+    let n = 1_000_000;
     let mut result = Vec::with_capacity(n);
 
     for _ in 0..n {
@@ -58,7 +58,7 @@ fn test_gen_index_with_weights_2() {
 
 #[test]
 fn test_gen_index_with_weights_3() {
-    let n = 1000000;
+    let n = 1_000_000;
     let weights = [5, 10];
 
     let mut result = Vec::with_capacity(n);
@@ -88,7 +88,7 @@ fn test_gen_index_with_weights_3() {
 
 #[test]
 fn test_gen_index_with_weights_4() {
-    let n = 1000000;
+    let n = 1_000_000;
     let weights = [5, 10, 15, 20, 25];
 
     let mut result = Vec::with_capacity(n);
@@ -128,7 +128,7 @@ fn test_gen_index_with_weights_4() {
 
 #[test]
 fn test_gen_index_with_weights_5() {
-    let n = 1000000;
+    let n = 1_000_000;
     let weights = [5];
 
     let mut result = Vec::with_capacity(n);
@@ -168,7 +168,7 @@ fn test_gen_index_with_weights_5() {
 
 #[test]
 fn test_gen_multiple_index_with_weights_1() {
-    let n = 1000000;
+    let n = 1_000_000;
     let weights = [5, 10];
 
     let result = random_pick::gen_multiple_usize_with_weights(2, &weights, n);
@@ -190,7 +190,7 @@ fn test_gen_multiple_index_with_weights_1() {
 
 #[test]
 fn test_gen_multiple_index_with_weights_2() {
-    let n = 1000000;
+    let n = 1_000_000;
     let weights = [5, 10, 15, 20, 25];
 
     let result = random_pick::gen_multiple_usize_with_weights(5, &weights, n);
@@ -216,7 +216,7 @@ fn test_gen_multiple_index_with_weights_2() {
 
 #[test]
 fn test_gen_multiple_index_with_weights_3() {
-    let n = 1000000;
+    let n = 1_000_000;
     let weights = [5, 10];
 
     let result = random_pick::gen_multiple_usize_with_weights(10, &weights, n);
@@ -242,7 +242,7 @@ fn test_gen_multiple_index_with_weights_3() {
 
 #[test]
 fn test_gen_multiple_index_with_weights_4() {
-    let n = 1000000;
+    let n = 1_000_000;
     let weights = [5, 10, 15, 20, 25];
 
     let result = random_pick::gen_multiple_usize_with_weights(10, &weights, n);
@@ -278,7 +278,7 @@ fn test_gen_multiple_index_with_weights_4() {
 
 #[test]
 fn test_gen_multiple_index_with_weights_5() {
-    let n = 1000000;
+    let n = 1_000_000;
     let weights = [5];
 
     let result = random_pick::gen_multiple_usize_with_weights(10, &weights, n);
@@ -325,8 +325,7 @@ fn test_pick_from_slice() {
 
     let weights = [1, 5, 15, 30];
 
-
-    let n = 1000000;
+    let n = 1_000_000;
     let mut result = Vec::with_capacity(n);
 
     for _ in 0..n {
@@ -337,7 +336,7 @@ fn test_pick_from_slice() {
 
     let mut counter = [0usize; 4];
 
-    for ref picked_item in result {
+    for picked_item in result {
         match picked_item {
             Prize::Legendary => {
                 counter[0] += 1;
@@ -380,13 +379,12 @@ fn test_pick_multiple_from_slice() {
 
     let weights = [1, 5, 15, 30];
 
-
-    let n = 1000000;
+    let n = 1_000_000;
     let result = random_pick::pick_multiple_from_slice(&prize_list, &weights, n);
 
     let mut counter = [0usize; 4];
 
-    for ref picked_item in result {
+    for picked_item in result {
         match picked_item {
             Prize::Legendary => {
                 counter[0] += 1;
@@ -430,13 +428,16 @@ fn test_pick_from_mutliple_slices() {
 
     let weights = [1, 5, 15, 30];
 
-
-    let n = 1000000;
-    let result = random_pick::pick_multiple_from_multiple_slices(&[&prize_list_1, &prize_list_2], &weights, n);
+    let n = 1_000_000;
+    let result = random_pick::pick_multiple_from_multiple_slices(
+        &[&prize_list_1, &prize_list_2],
+        &weights,
+        n,
+    );
 
     let mut counter = [0usize; 4];
 
-    for ref picked_item in result {
+    for picked_item in result {
         match picked_item {
             Prize::Legendary => {
                 counter[0] += 1;
@@ -480,19 +481,20 @@ fn test_pick_multiple_from_mutliple_slices() {
 
     let weights = [1, 5, 15, 30];
 
-
-    let n = 1000000;
+    let n = 1_000_000;
     let mut result = Vec::with_capacity(n);
 
     for _ in 0..n {
-        let picked_item = random_pick::pick_from_multiple_slices(&[&prize_list_1, &prize_list_2], &weights).unwrap();
+        let picked_item =
+            random_pick::pick_from_multiple_slices(&[&prize_list_1, &prize_list_2], &weights)
+                .unwrap();
 
         result.push(picked_item);
     }
 
     let mut counter = [0usize; 4];
 
-    for ref picked_item in result {
+    for picked_item in result {
         match picked_item {
             Prize::Legendary => {
                 counter[0] += 1;

@@ -95,34 +95,48 @@ pub fn pick_from_multiple_slices<'a, T>(slices: &[&'a [T]], weights: &'a [usize]
 }
 
 /// Pick multiple elements from a slice randomly by given weights.
-pub fn pick_multiple_from_slice<'a, T>(slice: &'a [T], weights: &'a [usize], count: usize) -> Vec<&'a T> {
+pub fn pick_multiple_from_slice<'a, T>(
+    slice: &'a [T],
+    weights: &'a [usize],
+    count: usize,
+) -> Vec<&'a T> {
     let slice_len = slice.len();
 
-    gen_multiple_usize_with_weights(slice_len, weights, count).iter().map(|&index| &slice[index]).collect()
+    gen_multiple_usize_with_weights(slice_len, weights, count)
+        .iter()
+        .map(|&index| &slice[index])
+        .collect()
 }
 
 /// Pick multiple elements from multiple slices randomly by given weights.
-pub fn pick_multiple_from_multiple_slices<'a, T>(slices: &[&'a [T]], weights: &'a [usize], count: usize) -> Vec<&'a T> {
+pub fn pick_multiple_from_multiple_slices<'a, T>(
+    slices: &[&'a [T]],
+    weights: &'a [usize],
+    count: usize,
+) -> Vec<&'a T> {
     let len: usize = slices.iter().map(|slice| slice.len()).sum();
 
-    gen_multiple_usize_with_weights(len, weights, count).iter().map(|index| {
-        let mut index = *index;
+    gen_multiple_usize_with_weights(len, weights, count)
+        .iter()
+        .map(|index| {
+            let mut index = *index;
 
-        let mut s = slices[0];
+            let mut s = slices[0];
 
-        for slice in slices {
-            let len = slice.len();
+            for slice in slices {
+                let len = slice.len();
 
-            if index < len {
-                s = slice;
-                break;
-            } else {
-                index -= len;
+                if index < len {
+                    s = slice;
+                    break;
+                } else {
+                    index -= len;
+                }
             }
-        }
 
-        &s[index]
-    }).collect()
+            &s[index]
+        })
+        .collect()
 }
 
 /// Get a usize value by given weights.
@@ -165,7 +179,10 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
             if temp > rnd {
                 let index = ((i as f64) * index_scale) as usize;
 
-                return Some(random_usize(index, ((((i + 1) as f64) * index_scale) - 1f64) as usize));
+                return Some(random_usize(
+                    index,
+                    ((((i + 1) as f64) * index_scale) - 1f64) as usize,
+                ));
             }
         }
     }
@@ -212,7 +229,10 @@ pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: us
                         if temp > rnd {
                             let index = ((i as f64) * index_scale) as usize;
 
-                            result.push(random_usize(index, ((((i + 1) as f64) * index_scale) - 1f64) as usize));
+                            result.push(random_usize(
+                                index,
+                                ((((i + 1) as f64) * index_scale) - 1f64) as usize,
+                            ));
                             break;
                         }
                     }
