@@ -58,12 +58,12 @@ Besides picking a single element from a slice or slices, you can also use `pick_
 
 extern crate alloc;
 
-extern crate random_integer;
+#[macro_use]
+extern crate random_number;
 
 use alloc::vec::Vec;
 
-use random_integer::rand::thread_rng;
-use random_integer::{random_usize, random_usize_with_rng};
+use random_number::rand::thread_rng;
 
 const MAX_NUMBER: usize = usize::max_value();
 
@@ -151,7 +151,7 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
             return None;
         }
 
-        return Some(random_usize(0, high - 1));
+        return Some(random!(0..high));
     } else {
         let mut weights_sum = 0f64;
         let mut max_weight = 0;
@@ -173,7 +173,7 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
 
         let weights_scale = (MAX_NUMBER as f64) / weights_sum;
 
-        let rnd = random_usize_with_rng(0, MAX_NUMBER, &mut rng) as f64;
+        let rnd = random!(0..=MAX_NUMBER, rng) as f64;
 
         let mut temp = 0f64;
 
@@ -182,11 +182,7 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
             if temp > rnd {
                 let index = ((i as f64) * index_scale) as usize;
 
-                return Some(random_usize_with_rng(
-                    index,
-                    ((((i + 1) as f64) * index_scale) - 1f64) as usize,
-                    &mut rng,
-                ));
+                return Some(random!(index..((((i + 1) as f64) * index_scale) as usize), rng));
             }
         }
     }
@@ -206,7 +202,7 @@ pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: us
                 let mut rng = thread_rng();
 
                 for _ in 0..count {
-                    result.push(random_usize_with_rng(0, high - 1, &mut rng));
+                    result.push(random!(0..high, rng));
                 }
             }
         } else {
@@ -228,7 +224,7 @@ pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: us
                 let mut rng = thread_rng();
 
                 for _ in 0..count {
-                    let rnd = random_usize_with_rng(0, MAX_NUMBER, &mut rng) as f64;
+                    let rnd = random!(0..=MAX_NUMBER, rng) as f64;
 
                     let mut temp = 0f64;
 
@@ -237,10 +233,9 @@ pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: us
                         if temp > rnd {
                             let index = ((i as f64) * index_scale) as usize;
 
-                            result.push(random_usize_with_rng(
-                                index,
-                                ((((i + 1) as f64) * index_scale) - 1f64) as usize,
-                                &mut rng,
+                            result.push(random!(
+                                index..((((i + 1) as f64) * index_scale) as usize),
+                                rng
                             ));
                             break;
                         }
