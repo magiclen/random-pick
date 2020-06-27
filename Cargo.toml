@@ -1,6 +1,6 @@
 [package]
 name = "random-pick"
-version = "1.2.9"
+version = "1.2.10"
 authors = ["Magic Len <len@magiclen.org>"]
 edition = "2018"
 repository = "https://github.com/magiclen/random-pick"
@@ -10,6 +10,7 @@ categories = ["no-std", "algorithms"]
 description= "Pick an element from a slice randomly by given weights."
 readme = "README.md"
 license = "MIT"
+include = ["src/**/*", "Cargo.toml"]
 
 [badges.travis-ci]
 repository = "magiclen/random-pick"
