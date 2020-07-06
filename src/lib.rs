@@ -156,7 +156,7 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
         let mut weights_sum = 0f64;
         let mut max_weight = 0;
 
-        for &w in weights {
+        for w in weights.iter().copied() {
             weights_sum += w as f64;
             if w > max_weight {
                 max_weight = w;
@@ -177,7 +177,7 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
 
         let mut temp = 0f64;
 
-        for (i, &w) in weights.iter().enumerate() {
+        for (i, w) in weights.iter().copied().enumerate() {
             temp += (w as f64) * weights_scale;
             if temp > rnd {
                 let index = ((i as f64) * index_scale) as usize;
@@ -209,7 +209,7 @@ pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: us
             let mut weights_sum = 0f64;
             let mut max_weight = 0;
 
-            for &w in weights {
+            for w in weights.iter().copied() {
                 weights_sum += w as f64;
                 if w > max_weight {
                     max_weight = w;
