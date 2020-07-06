@@ -228,7 +228,7 @@ pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: us
 
                     let mut temp = 0f64;
 
-                    for (i, &w) in weights.iter().enumerate() {
+                    for (i, w) in weights.iter().copied().enumerate() {
                         temp += (w as f64) * weights_scale;
                         if temp > rnd {
                             let index = ((i as f64) * index_scale) as usize;
