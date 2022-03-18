@@ -1,5 +1,3 @@
-extern crate random_pick;
-
 #[test]
 fn test_gen_index_with_weights_1() {
     let n = 1_000_000;

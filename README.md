@@ -8,8 +8,6 @@ Pick an element from a slice randomly by given weights.
 ## Example
 
 ```rust
-extern crate random_pick;
-
 enum Prize {
     Legendary,
     Rare,

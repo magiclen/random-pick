@@ -1,8 +1,8 @@
 [package]
 name = "random-pick"
-version = "1.2.14"
+version = "1.2.15"
 authors = ["Magic Len <len@magiclen.org>"]
-edition = "2018"
+edition = "2021"
 repository = "https://github.com/magiclen/random-pick"
 homepage = "https://magiclen.org/random-pick"
 keywords = ["random", "pick", "choose", "array", "slice"]
