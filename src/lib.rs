@@ -55,7 +55,7 @@ Besides picking a single element from a slice or slices, you can also use `pick_
 use random_number::rand::thread_rng;
 use random_number::random;
 
-const MAX_NUMBER: usize = usize::max_value();
+const MAX_NUMBER: usize = usize::MAX;
 
 /// Pick an element from a slice randomly by given weights.
 pub fn pick_from_slice<'a, T>(slice: &'a [T], weights: &'a [usize]) -> Option<&'a T> {
