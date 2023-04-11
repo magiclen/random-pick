@@ -338,16 +338,16 @@ fn test_pick_from_slice() {
         match picked_item {
             Prize::Legendary => {
                 counter[0] += 1;
-            }
+            },
             Prize::Rare => {
                 counter[1] += 1;
-            }
+            },
             Prize::Enchanted => {
                 counter[2] += 1;
-            }
+            },
             Prize::Common => {
                 counter[3] += 1;
-            }
+            },
         }
     }
 
@@ -386,16 +386,16 @@ fn test_pick_multiple_from_slice() {
         match picked_item {
             Prize::Legendary => {
                 counter[0] += 1;
-            }
+            },
             Prize::Rare => {
                 counter[1] += 1;
-            }
+            },
             Prize::Enchanted => {
                 counter[2] += 1;
-            }
+            },
             Prize::Common => {
                 counter[3] += 1;
-            }
+            },
         }
     }
 
@@ -439,16 +439,16 @@ fn test_pick_from_mutliple_slices() {
         match picked_item {
             Prize::Legendary => {
                 counter[0] += 1;
-            }
+            },
             Prize::Rare => {
                 counter[1] += 1;
-            }
+            },
             Prize::Enchanted => {
                 counter[2] += 1;
-            }
+            },
             Prize::Common => {
                 counter[3] += 1;
-            }
+            },
         }
     }
 
@@ -496,16 +496,16 @@ fn test_pick_multiple_from_mutliple_slices() {
         match picked_item {
             Prize::Legendary => {
                 counter[0] += 1;
-            }
+            },
             Prize::Rare => {
                 counter[1] += 1;
-            }
+            },
             Prize::Enchanted => {
                 counter[2] += 1;
-            }
+            },
             Prize::Common => {
                 counter[3] += 1;
-            }
+            },
         }
     }
 

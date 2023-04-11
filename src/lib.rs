@@ -52,8 +52,7 @@ If you have multiple slices, you don't need to use extra space to concat them, j
 Besides picking a single element from a slice or slices, you can also use `pick_multiple_from_slice` and `pick_multiple_from_multiple_slices` functions. Their overhead is lower than that of non-multiple-pick functions with extra loops.
 */
 
-use random_number::rand::thread_rng;
-use random_number::random;
+use random_number::{rand::thread_rng, random};
 
 const MAX_NUMBER: usize = usize::MAX;
 
