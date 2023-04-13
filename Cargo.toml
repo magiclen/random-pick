@@ -9,7 +9,6 @@ homepage = "https://magiclen.org/random-pick"
 keywords = ["random", "pick", "choose", "array", "slice"]
 categories = ["algorithms"]
 description = "Pick an element from a slice randomly by given weights."
-readme = "README.md"
 license = "MIT"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
