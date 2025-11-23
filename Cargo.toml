@@ -1,9 +1,9 @@
 [package]
 name = "random-pick"
-version = "1.2.16"
+version = "1.2.17"
 authors = ["Magic Len <len@magiclen.org>"]
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.63"
 repository = "https://github.com/magiclen/random-pick"
 homepage = "https://magiclen.org/random-pick"
 keywords = ["random", "pick", "choose", "array", "slice"]
@@ -13,4 +13,4 @@ license = "MIT"
 include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
 [dependencies]
-random-number = "0.1"
+rand = "0.9"

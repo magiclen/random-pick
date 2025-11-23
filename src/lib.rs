@@ -52,7 +52,7 @@ If you have multiple slices, you don't need to use extra space to concat them, j
 Besides picking a single element from a slice or slices, you can also use `pick_multiple_from_slice` and `pick_multiple_from_multiple_slices` functions. Their overhead is lower than that of non-multiple-pick functions with extra loops.
 */
 
-use random_number::{rand::thread_rng, random};
+use rand::{rng, Rng};
 
 const MAX_NUMBER: usize = usize::MAX;
 
@@ -140,7 +140,7 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
             return None;
         }
 
-        return Some(random!(0..high));
+        return Some(rng().random_range(0..high));
     } else {
         let mut weights_sum = 0f64;
         let mut max_weight = 0;
@@ -156,13 +156,13 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
             return None;
         }
 
-        let mut rng = thread_rng();
+        let mut rng = rng();
 
         let index_scale = (high as f64) / (weights_len as f64);
 
         let weights_scale = (MAX_NUMBER as f64) / weights_sum;
 
-        let rnd = random!(0..=MAX_NUMBER, rng) as f64;
+        let rnd = rng.random_range(0..=MAX_NUMBER) as f64;
 
         let mut temp = 0f64;
 
@@ -171,7 +171,7 @@ pub fn gen_usize_with_weights(high: usize, weights: &[usize]) -> Option<usize> {
             if temp > rnd {
                 let index = ((i as f64) * index_scale) as usize;
 
-                return Some(random!(index..((((i + 1) as f64) * index_scale) as usize), rng));
+                return Some(rng.random_range(index..((((i + 1) as f64) * index_scale) as usize)));
             }
         }
     }
@@ -188,10 +188,10 @@ pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: us
     if weights_len > 0 && high > 0 {
         if weights_len == 1 {
             if weights[0] != 0 {
-                let mut rng = thread_rng();
+                let mut rng = rng();
 
                 for _ in 0..count {
-                    result.push(random!(0..high, rng));
+                    result.push(rng.random_range(0..high));
                 }
             }
         } else {
@@ -210,10 +210,10 @@ pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: us
 
                 let weights_scale = (MAX_NUMBER as f64) / weights_sum;
 
-                let mut rng = thread_rng();
+                let mut rng = rng();
 
                 for _ in 0..count {
-                    let rnd = random!(0..=MAX_NUMBER, rng) as f64;
+                    let rnd = rng.random_range(0..=MAX_NUMBER) as f64;
 
                     let mut temp = 0f64;
 
@@ -222,10 +222,11 @@ pub fn gen_multiple_usize_with_weights(high: usize, weights: &[usize], count: us
                         if temp > rnd {
                             let index = ((i as f64) * index_scale) as usize;
 
-                            result.push(random!(
-                                index..((((i + 1) as f64) * index_scale) as usize),
-                                rng
-                            ));
+                            result.push(
+                                rng.random_range(
+                                    index..((((i + 1) as f64) * index_scale) as usize),
+                                ),
+                            );
                             break;
                         }
                     }
